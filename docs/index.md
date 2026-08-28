@@ -42,14 +42,14 @@ SELECT
   diversity(score=ctr, strength=0.3) AS div_rank,
   *
 FROM retrieve(
-  similarity(
-    embedding_ref='content_embedding',
-    encoder=text_encoder(text_embedding_ref='query_vector'),
+  text_search(
+    query=$query_text,
+    mode=vector(text_embedding_ref='content_embedding'),
     name='vector_matches',
     limit=100
   ),
   text_search(
-    input_text_query=$query_text,
+    query=$query_text,
     mode=lexical(),
     name='keyword_matches',
     limit=100
@@ -79,13 +79,12 @@ query:
   from: item
   type: rank
   retrieve:
-    - type: similarity
+    - type: text_search
       name: vector_matches
-      embedding_ref: content_embedding
-      query_encoder:
-        type: text_encoder
-        text_embedding_ref: query_vector
-        input_text_query: $parameter.query_text
+      input_text_query: $parameter.query_text
+      mode:
+        type: vector
+        text_embedding_ref: content_embedding
       limit: 100
     - type: text_search
       name: keyword_matches

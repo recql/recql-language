@@ -65,13 +65,12 @@ query:
   from: item
   type: rank
   retrieve:
-    - type: similarity
+    - type: text_search
       name: vector_matches
-      embedding_ref: content_embedding
-      query_encoder:
-        type: text_encoder
+      input_text_query: $parameter.query_text
+      mode:
+        type: vector
         text_embedding_ref: content_embedding
-        input_text_query: $parameter.query_text
       limit: 100
     - type: text_search
       name: keyword_matches
@@ -197,10 +196,10 @@ Encoders produce query embedding representations at evaluation time.
 | :--- | :--- | :--- |
 | `precomputed_user` | `input_user_id` | Looks up precomputed user factor vector in catalog embedding table. |
 | `precomputed_item` | `input_item_id` | Looks up precomputed item embedding vector in catalog table. |
-| `text_encoder` | `text_embedding_ref`, `input_text_query` | Encodes text query online using registered embedding model. |
 | `interaction_pooling` | `input_user_id`, `pooling_function`, `truncate_interactions` | Aggregates embedding vectors of user's recent interactions (`mean`/`sum`/`max`). |
 | `interaction_round_robin` | `input_user_id`, `num_clusters`, `pooling_function` | Clusters recent interactions to emit multiple candidate search vectors. |
 | `user_attribute_pooling` | `input_user_id`, `input_user_features` | Pools features from tabular user attribute profiles. |
+| `item_attribute_pooling` | `input_item_id`, `input_item_features` | Pools features from tabular item attribute profiles. |
 
 ---
 

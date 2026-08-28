@@ -22,9 +22,10 @@ Finds items semantically relevant to an unstructured text prompt using neural de
 
 ```sql
 SELECT * FROM retrieve(
-  similarity(
-    embedding_ref='content_embedding',
-    encoder=text_encoder(text_embedding_ref='content_embedding'),
+  text_search(
+    query=$query_text,
+    mode='vector',
+    text_embedding_ref='content_embedding',
     name='semantic_matches',
     limit=50
   )
@@ -45,13 +46,12 @@ query:
   from: item
   type: rank
   retrieve:
-    - type: similarity
+    - type: text_search
       name: semantic_matches
-      embedding_ref: content_embedding
-      query_encoder:
-        type: text_encoder
+      input_text_query: $parameter.query_text
+      mode:
+        type: vector
         text_embedding_ref: content_embedding
-        input_text_query: $parameter.query_text
       limit: 50
   limit: 20
 ```
@@ -76,9 +76,9 @@ SELECT * FROM retrieve(
     name='bm25_bag',
     limit=100
   ),
-  similarity(
-    embedding_ref='content_embedding',
-    encoder=text_encoder(text_embedding_ref='content_embedding'),
+  text_search(
+    input_text_query=$query_text,
+    mode=vector(text_embedding_ref='content_embedding'),
     name='vector_bag',
     limit=100
   )
@@ -106,13 +106,12 @@ query:
         type: lexical
         fuzziness_edit_distance: 0
       limit: 100
-    - type: similarity
+    - type: text_search
       name: vector_bag
-      embedding_ref: content_embedding
-      query_encoder:
-        type: text_encoder
+      input_text_query: $parameter.query_text
+      mode:
+        type: vector
         text_embedding_ref: content_embedding
-        input_text_query: $parameter.query_text
       limit: 100
   limit: 20
 ```

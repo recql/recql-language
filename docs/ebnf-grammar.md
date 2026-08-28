@@ -164,7 +164,6 @@ encoder_call          ::= precomputed_user_call
                         | interaction_round_robin_call
                         | user_attribute_pooling_call
                         | item_attribute_pooling_call
-                        | text_encoder_call
 
 precomputed_user_call ::= 'precomputed_user' '(' 'input_user_id' '=' ( string_literal | param ) ')'
                         | 'precomputed_user' '(' ( string_literal | param ) ')'
@@ -193,11 +192,6 @@ item_attribute_pooling_call  ::= 'item_attribute_pooling' '(' item_attr_pooling_
 item_attr_pooling_arg_list   ::= item_attr_pooling_arg { ',' item_attr_pooling_arg }
 item_attr_pooling_arg        ::= 'input_item_id' '=' ( string_literal | param )
                                | 'input_item_features' '=' ( object_literal | param )
-
-text_encoder_call            ::= 'text_encoder' '(' text_encoder_arg_list ')'
-text_encoder_arg_list        ::= text_encoder_arg { ',' text_encoder_arg }
-text_encoder_arg             ::= 'text_embedding_ref' '=' ( string_literal | param )
-                               | 'use_exact_search' '=' ( BOOLEAN | param )
 
 (* =========================================================================== *)
 (* Search Modes (for text_search)                                              *)

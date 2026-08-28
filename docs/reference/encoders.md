@@ -37,25 +37,7 @@ precomputed_item(input_item_id=$item_id)
 
 ---
 
-## 3. `text_encoder(...)`
-
-Encodes an incoming text query string into a dense embedding vector in real time using a HuggingFace / SentenceTransformer model (e.g. `all-MiniLM-L6-v2`).
-
-```sql
-text_encoder(
-  text_embedding_ref='content_embedding',
-  [use_exact_search=false]
-)
-```
-
-| Parameter | Type | Required | Default | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| `text_embedding_ref` | `string` | **Yes** | — | Embedding store name configured in `engine.yaml`. |
-| `use_exact_search` | `boolean` | No | `false` | Whether to perform exact brute-force scan. |
-
----
-
-## 4. `interaction_pooling(...)`
+## 3. `interaction_pooling(...)`
 
 Dynamically pools the embedding vectors of items the user has recently interacted with into a composite user representation.
 
@@ -75,7 +57,7 @@ interaction_pooling(
 
 ---
 
-## 5. `interaction_round_robin(...)`
+## 4. `interaction_round_robin(...)`
 
 Clusters recent interaction item embeddings into $k$ distinct interest clusters to generate multiple candidate queries for multi-interest users.
 
@@ -89,7 +71,7 @@ interaction_round_robin(
 
 ---
 
-## 6. `user_attribute_pooling(...)` & `item_attribute_pooling(...)`
+## 5. `user_attribute_pooling(...)` & `item_attribute_pooling(...)`
 
 Computes query representations from tabular attribute dictionaries or profile features.
 

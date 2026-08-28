@@ -29,7 +29,7 @@ similarity(
 | Parameter | Type | Required | Default | Description |
 | :--- | :--- | :--- | :--- | :--- |
 | `embedding_ref` | `string` | **Yes** | — | Name of the embedding store configured in `engine.yaml`. |
-| `encoder` | `QueryEncoder` | **Yes** | — | The encoder function used to produce the query vector (e.g. `precomputed_user`, `precomputed_item`, `text_encoder`). |
+| `encoder` | `QueryEncoder` | **Yes** | — | The encoder function used to produce the query vector (e.g. `precomputed_user`, `precomputed_item`, `interaction_pooling`). |
 | `where` | `Expr \| string` | No | `NULL` | Prefilter predicate pushed down to the vector index scan. |
 | `limit` | `integer` | No | `100` | Maximum candidate count to retrieve from this index. |
 | `name` | `string` | No | `'similarity'` | Identifier for this retrieve bag in diagnostics and merge logs. |
