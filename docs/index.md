@@ -61,7 +61,7 @@ LIMIT 20 OFFSET 0;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="YAML (OpenAPI IR)">
+<TabItem value="yaml" label="IR (YAML)">
 
 ```yaml
 parameters:
@@ -124,7 +124,7 @@ query:
                                                │ (Lex & Parse)
                                                ▼
                                ┌────────────────────────────────┐
-                               │   OpenAPI IR (RankQueryConfig) │◄── Or Direct YAML/JSON
+                               │   Executable IR (YAML / JSON)  │◄── Direct IR Submission
                                └───────────────┬────────────────┘
                                                │ (Bind against EngineCatalog)
                                                ▼
@@ -163,14 +163,14 @@ query:
 
 ---
 
-## Two Equivalent Representations: SQL and YAML
+## Dual Query Ingestion: High-Level RecQL or Direct IR
 
-RecQL text statements lower directly into the executable intermediate representation (`RankQueryConfig`), which conforms to the OpenAPI specification. You can author queries either in RecQL SQL syntax or in YAML/JSON format:
+RecQL text queries lower directly into the canonical Intermediate Representation (IR). Applications and services can submit ranking queries either in high-level RecQL SQL syntax or directly as structured IR in YAML or JSON:
 
-| RecQL SQL Syntax | YAML / OpenAPI IR |
+| High-Level RecQL SQL Syntax | Direct Intermediate Representation (IR) |
 | :--- | :--- |
 | Concise, expressive, human-readable | Machine-generated, structural, API-native |
-| Perfect for interactive queries, REPL, and codebases | Perfect for configuration files, APIs, and microservices |
-| Fully lowers to `RankQueryConfig` | Directly executes on the RecQL runtime |
+| Perfect for interactive queries, REPL, and codebases | Perfect for configuration files, programmatic clients, and APIs |
+| Lowers deterministically to IR | Directly executes on the RecQL runtime |
 
-See [YAML Representation](/docs/yaml-representation) for the complete structural specification.
+See [Intermediate Representation (IR)](/docs/ir) for the complete structural specification.

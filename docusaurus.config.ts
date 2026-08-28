@@ -61,9 +61,9 @@ const config: Config = {
           label: 'EBNF Grammar',
         },
         {
-          to: '/docs/yaml-representation',
+          to: '/docs/ir',
           position: 'left',
-          label: 'YAML / OpenAPI IR',
+          label: 'Intermediate Representation (IR)',
         },
         {
           to: '/docs/recipes',
@@ -96,8 +96,8 @@ const config: Config = {
               to: '/docs/ebnf-grammar',
             },
             {
-              label: 'YAML / OpenAPI IR',
-              to: '/docs/yaml-representation',
+              label: 'Intermediate Representation (IR)',
+              to: '/docs/ir',
             },
           ],
         },

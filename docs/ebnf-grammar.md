@@ -8,7 +8,7 @@ slug: /ebnf-grammar
 
 This document provides the formal **Extended Backus-Naur Form (EBNF)** specification for RecQL.
 
-Unlike generic SQL grammars that treat function calls as arbitrary identifier-value lists, this grammar is aligned with the **OpenAPI / YAML Query Definition** schema. Function productions explicitly enumerate the exact supported named parameters for retrievers, query encoders, scorers, and reorderers.
+Unlike generic SQL grammars that treat function calls as arbitrary identifier-value lists, this grammar is aligned directly with the **Intermediate Representation (IR)** specification. Function productions explicitly enumerate the exact supported named parameters for retrievers, query encoders, scorers, and reorderers.
 
 ---
 
@@ -63,7 +63,7 @@ param                 ::= '$' identifier [ '.' identifier ]
 
 ---
 
-## 2. Retriever Function Calls (Aligned with OpenAPI IR)
+## 2. Retriever Function Calls (Aligned with IR)
 
 ```ebnf
 (* =========================================================================== *)

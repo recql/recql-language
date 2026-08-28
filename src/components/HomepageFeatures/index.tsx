@@ -21,12 +21,12 @@ const FeatureList: FeatureItem[] = [
     ),
   },
   {
-    title: 'Formal EBNF & OpenAPI IR',
+    title: 'Formal EBNF & Intermediate Representation',
     badge: 'Spec-Driven',
     description: (
       <>
-        Every query lowers 1:1 into <code>RankQueryConfig</code>, validated strictly against OpenAPI
-        schemas and consumable via RecQL SQL syntax or structured YAML/JSON.
+        Queries lower deterministically into canonical IR, with support for direct IR submission
+        via structured YAML/JSON or high-level RecQL SQL compilation.
       </>
     ),
   },

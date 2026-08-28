@@ -10,7 +10,7 @@ const sidebars: SidebarsConfig = {
         'index',
         'semantics',
         'ebnf-grammar',
-        'yaml-representation',
+        'ir',
       ],
     },
     {

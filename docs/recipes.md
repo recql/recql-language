@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem';
 
 # RecQL Cookbook & Query Patterns
 
-This cookbook provides production-ready query templates for the most common search and recommendation patterns. Each recipe is shown in both **RecQL SQL syntax** and its equivalent **OpenAPI YAML IR representation**.
+This cookbook provides production-ready query templates for the most common search and recommendation patterns. Each recipe is shown in both high-level **RecQL SQL syntax** and its canonical **Intermediate Representation (IR)** in YAML format.
 
 ---
 
@@ -33,7 +33,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="YAML (OpenAPI IR)">
+<TabItem value="yaml" label="IR (YAML)">
 
 ```yaml
 parameters:
@@ -87,7 +87,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="YAML (OpenAPI IR)">
+<TabItem value="yaml" label="IR (YAML)">
 
 ```yaml
 parameters:
@@ -142,7 +142,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="YAML (OpenAPI IR)">
+<TabItem value="yaml" label="IR (YAML)">
 
 ```yaml
 parameters:
@@ -193,7 +193,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="YAML (OpenAPI IR)">
+<TabItem value="yaml" label="IR (YAML)">
 
 ```yaml
 parameters:
@@ -251,7 +251,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="YAML (OpenAPI IR)">
+<TabItem value="yaml" label="IR (YAML)">
 
 ```yaml
 parameters:
@@ -321,7 +321,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="YAML (OpenAPI IR)">
+<TabItem value="yaml" label="IR (YAML)">
 
 ```yaml
 parameters:
@@ -383,7 +383,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="YAML (OpenAPI IR)">
+<TabItem value="yaml" label="IR (YAML)">
 
 ```yaml
 parameters:
@@ -441,7 +441,7 @@ LIMIT 10;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="YAML (OpenAPI IR)">
+<TabItem value="yaml" label="IR (YAML)">
 
 ```yaml
 query:

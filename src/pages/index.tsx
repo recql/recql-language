@@ -32,8 +32,8 @@ function HomepageHeader() {
           </Link>
           <Link
             className="button button--outline button--secondary button--lg"
-            to="/docs/yaml-representation">
-            OpenAPI / YAML Spec
+            to="/docs/ir">
+            Intermediate Representation (IR)
           </Link>
           <Link
             className="button button--outline button--secondary button--lg"
@@ -51,7 +51,7 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="Language Specification & Grammar"
-      description="Official specification, EBNF grammar, OpenAPI intermediate representation, and cookbook for RecQL (Recommender Query Language).">
+      description="Official specification, EBNF grammar, Intermediate Representation (IR), and cookbook for RecQL (Recommender Query Language).">
       <HomepageHeader />
       <main>
         <HomepageFeatures />
