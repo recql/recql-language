@@ -18,7 +18,7 @@ This cookbook provides production-ready query templates for the most common sear
 Finds items semantically relevant to an unstructured text prompt using neural dense embeddings (e.g., SentenceTransformers / MiniLM).
 
 <Tabs>
-<TabItem value="sql" label="RecQL (SQL)" default>
+<TabItem value="recql" label="RecQL" default>
 
 ```sql
 SELECT * FROM retrieve(
@@ -34,7 +34,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="IR (YAML)">
+<TabItem value="yaml" label="YAML">
 
 ```yaml
 parameters:
@@ -66,7 +66,7 @@ query:
 Executes parallel full-text search and vector retrieval, merging candidates into a unified result set with deterministic priority.
 
 <Tabs>
-<TabItem value="sql" label="RecQL (SQL)" default>
+<TabItem value="recql" label="RecQL" default>
 
 ```sql
 SELECT * FROM retrieve(
@@ -87,7 +87,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="IR (YAML)">
+<TabItem value="yaml" label="YAML">
 
 ```yaml
 parameters:
@@ -126,7 +126,7 @@ query:
 Uses precomputed collaborative filtering embeddings (e.g. ALS factor vectors) to find similar items based on co-occurrence and implicit feedback.
 
 <Tabs>
-<TabItem value="sql" label="RecQL (SQL)" default>
+<TabItem value="recql" label="RecQL" default>
 
 ```sql
 SELECT * FROM retrieve(
@@ -141,7 +141,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="IR (YAML)">
+<TabItem value="yaml" label="YAML">
 
 ```yaml
 parameters:
@@ -173,7 +173,7 @@ query:
 Retrieves candidates via user collaborative filtering embeddings, then scores and re-ranks them using a trained LightGBM CTR model.
 
 <Tabs>
-<TabItem value="sql" label="RecQL (SQL)" default>
+<TabItem value="recql" label="RecQL" default>
 
 ```sql
 SELECT score(
@@ -192,7 +192,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="IR (YAML)">
+<TabItem value="yaml" label="YAML">
 
 ```yaml
 parameters:
@@ -230,7 +230,7 @@ query:
 Combines collaborative filtering recommendations with Maximal Marginal Relevance (MMR) diversity and novelty exploration.
 
 <Tabs>
-<TabItem value="sql" label="RecQL (SQL)" default>
+<TabItem value="recql" label="RecQL" default>
 
 ```sql
 SELECT 
@@ -250,7 +250,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="IR (YAML)">
+<TabItem value="yaml" label="YAML">
 
 ```yaml
 parameters:
@@ -293,7 +293,7 @@ query:
 Interleaves sponsored or promotional items (e.g. Comedy specials) into organic user recommendation streams.
 
 <Tabs>
-<TabItem value="sql" label="RecQL (SQL)" default>
+<TabItem value="recql" label="RecQL" default>
 
 ```sql
 SELECT 
@@ -320,7 +320,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="IR (YAML)">
+<TabItem value="yaml" label="YAML">
 
 ```yaml
 parameters:
@@ -365,7 +365,7 @@ query:
 Queries vector similarity while applying array facet constraints on multi-valued categories.
 
 <Tabs>
-<TabItem value="sql" label="RecQL (SQL)" default>
+<TabItem value="recql" label="RecQL" default>
 
 ```sql
 SELECT * FROM retrieve(
@@ -382,7 +382,7 @@ LIMIT 20;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="IR (YAML)">
+<TabItem value="yaml" label="YAML">
 
 ```yaml
 parameters:
@@ -427,7 +427,7 @@ query:
 Excludes items already seen in prior pages using persistent key-value tracking (`pagination_key`).
 
 <Tabs>
-<TabItem value="sql" label="RecQL (SQL)" default>
+<TabItem value="recql" label="RecQL" default>
 
 ```sql
 SELECT * FROM retrieve(
@@ -440,7 +440,7 @@ LIMIT 10;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="IR (YAML)">
+<TabItem value="yaml" label="YAML">
 
 ```yaml
 query:

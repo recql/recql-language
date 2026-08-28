@@ -34,7 +34,7 @@ Traditionally, developers glue these stages together using ad-hoc application co
 A standard RecQL query expresses the full ranking pipeline declaratively:
 
 <Tabs>
-<TabItem value="sql" label="RecQL (SQL)" default>
+<TabItem value="recql" label="RecQL" default>
 
 ```sql
 SELECT 
@@ -61,7 +61,7 @@ LIMIT 20 OFFSET 0;
 ```
 
 </TabItem>
-<TabItem value="yaml" label="IR (YAML)">
+<TabItem value="yaml" label="YAML">
 
 ```yaml
 parameters:
