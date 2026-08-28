@@ -4,6 +4,9 @@ sidebar_label: Overview
 slug: /
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # RecQL Language Overview
 
 **RecQL** (Recommender Query Language) is a declarative, vendor-agnostic domain-specific query language for **multi-stage recommendation, vector search, lexical search, hybrid fusion, ML scoring, and reordering pipelines**.
@@ -28,7 +31,10 @@ Traditionally, developers glue these stages together using ad-hoc application co
 
 ## Anatomy of a RecQL Query
 
-A standard RecQL query looks like standard SQL extended with ranking functions:
+A standard RecQL query expresses the full ranking pipeline declaratively:
+
+<Tabs>
+<TabItem value="sql" label="RecQL (SQL)" default>
 
 ```sql
 SELECT 
@@ -53,6 +59,59 @@ WHERE array_has(genres, $genre)
 ORDER BY div_rank
 LIMIT 20 OFFSET 0;
 ```
+
+</TabItem>
+<TabItem value="yaml" label="YAML (OpenAPI IR)">
+
+```yaml
+parameters:
+  user_id:
+    type: string
+    default: "42"
+  query_text:
+    type: string
+    default: "sci-fi adventure"
+  genre:
+    type: string
+    default: "Sci-Fi"
+
+query:
+  from: item
+  type: rank
+  retrieve:
+    - type: similarity
+      name: vector_matches
+      embedding_ref: content_embedding
+      query_encoder:
+        type: text_encoder
+        text_embedding_ref: query_vector
+        input_text_query: $parameter.query_text
+      limit: 100
+    - type: text_search
+      name: keyword_matches
+      input_text_query: $parameter.query_text
+      mode:
+        type: lexical
+        fuzziness_edit_distance: 0
+      limit: 100
+  filter:
+    - type: expression
+      expression: "array_has(genres, $parameter.genre)"
+  score:
+    type: score_ensemble
+    value_model: click_through_rate
+    input_user_id: $parameter.user_id
+    output_alias: ctr
+  reorder:
+    - type: diversity
+      strength: 0.3
+      output_alias: div_rank
+  limit: 20
+  offset: 0
+```
+
+</TabItem>
+</Tabs>
 
 ---
 
@@ -114,4 +173,4 @@ RecQL text statements lower directly into the executable intermediate representa
 | Perfect for interactive queries, REPL, and codebases | Perfect for configuration files, APIs, and microservices |
 | Fully lowers to `RankQueryConfig` | Directly executes on the RecQL runtime |
 
-See [YAML Representation](yaml-representation) for the complete structural specification.
+See [YAML Representation](/docs/yaml-representation) for the complete structural specification.
