@@ -24,3 +24,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
+*.swp
+.*.swp
+*~
+.DS_Store
