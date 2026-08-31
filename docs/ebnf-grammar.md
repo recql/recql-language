@@ -8,7 +8,7 @@ slug: /ebnf-grammar
 
 This document provides the formal **Extended Backus-Naur Form (EBNF)** specification for RecQL.
 
-Unlike generic SQL grammars that treat function calls as arbitrary identifier-value lists, this grammar is aligned directly with the **Intermediate Representation (IR)** specification. Function productions explicitly enumerate the exact supported named parameters for retrievers, query encoders, scorers, and reorderers.
+The grammar defines the statement syntax, retriever functions, encoder configurations, search modes, ML scoring/expression definitions, reordering operators, and expression operator precedence.
 
 ---
 
@@ -21,16 +21,13 @@ Unlike generic SQL grammars that treat function calls as arbitrary identifier-va
 
 query                 ::= select_stmt [ ';' ] EOF
 
-select_stmt           ::= [ with_clause ]
-                          'SELECT' select_list
+select_stmt           ::= 'SELECT' select_list
                           [ 'FROM' from_clause ]
                           [ 'WHERE' expr ]
                           [ 'ORDER' 'BY' order_list ]
                           [ 'REORDER' 'BY' reorder_list ]
                           [ 'LIMIT'  limit_value ]
                           [ 'OFFSET' offset_value ]
-
-with_clause           ::= 'WITH' identifier 'AS' '(' select_stmt ')'
 
 select_list           ::= select_item { ',' select_item }
 select_item           ::= '*'
@@ -63,7 +60,7 @@ param                 ::= '$' identifier [ '.' identifier ]
 
 ---
 
-## 2. Retriever Function Calls (Aligned with IR)
+## 2. Retriever Function Calls (in `FROM retrieve(...)`)
 
 ```ebnf
 (* =========================================================================== *)
@@ -80,16 +77,24 @@ retriever_call        ::= similarity_call
                         | candidate_attributes_call
 
 (* --------------------------------------------------------------------------- *)
-(* 1. similarity(...)                                                          *)
+(* 1. similarity(...) (alias: similar_items)                                   *)
 (* --------------------------------------------------------------------------- *)
-similarity_call       ::= 'similarity' '(' similarity_arg_list ')'
+similarity_call       ::= ( 'similarity' | 'similar_items' ) '(' similarity_arg_list ')'
 
 similarity_arg_list   ::= similarity_arg { ',' similarity_arg }
-similarity_arg        ::= 'embedding_ref' '=' ( string_literal | param )
-                        | ( 'encoder' | 'query_encoder' ) '=' encoder_call
+similarity_arg        ::= ( 'embedding_ref' | 'embedding' ) '=' ( string_literal | identifier | param )
+                        | ( 'encoder' | 'query_encoder' ) '=' encoder_spec
+                        | 'input_user_id' '=' ( string_literal | identifier | param )
+                        | 'input_item_id' '=' ( string_literal | identifier | param )
+                        | 'pooling_function' '=' ( string_literal | identifier | param )
+                        | 'truncate_interactions' '=' ( INTEGER | param )
+                        | 'input_user_features' '=' ( object_literal | param )
+                        | 'input_item_features' '=' ( object_literal | param )
+                        | 'num_clusters' '=' ( INTEGER | param )
                         | 'where' '=' ( predicate_expr | string_literal )
                         | 'limit' '=' ( INTEGER | param )
                         | 'name' '=' ( string_literal | identifier )
+                        | 'backend' '=' ( string_literal | identifier )
                         | 'use_exact_search' '=' ( BOOLEAN | param )
 
 (* --------------------------------------------------------------------------- *)
@@ -98,11 +103,14 @@ similarity_arg        ::= 'embedding_ref' '=' ( string_literal | param )
 text_search_call      ::= 'text_search' '(' text_search_arg_list ')'
 
 text_search_arg_list  ::= text_search_arg { ',' text_search_arg }
-text_search_arg       ::= 'input_text_query' '=' ( string_literal | param )
-                        | 'mode' '=' search_mode_call
+text_search_arg       ::= ( 'input_text_query' | 'query' ) '=' ( string_literal | param )
+                        | 'mode' '=' search_mode_spec
+                        | ( 'text_embedding_ref' | 'embedding_ref' ) '=' ( string_literal | param )
+                        | ( 'fuzziness' | 'fuzziness_edit_distance' ) '=' ( INTEGER | param )
                         | 'where' '=' ( predicate_expr | string_literal )
                         | 'limit' '=' ( INTEGER | param )
                         | 'name' '=' ( string_literal | identifier )
+                        | 'backend' '=' ( string_literal | identifier )
 
 (* --------------------------------------------------------------------------- *)
 (* 3. column_order(...)                                                        *)
@@ -114,6 +122,7 @@ column_order_arg      ::= 'columns' '=' ( column_spec_list | string_literal )
                         | 'where' '=' ( predicate_expr | string_literal )
                         | 'limit' '=' ( INTEGER | param )
                         | 'name' '=' ( string_literal | identifier )
+                        | 'backend' '=' ( string_literal | identifier )
 
 column_spec_list      ::= '[' column_spec { ',' column_spec } ']'
 column_spec           ::= identifier [ 'ASC' | 'DESC' ] [ 'NULLS' ( 'FIRST' | 'LAST' ) ]
@@ -127,85 +136,104 @@ filter_arg_list       ::= filter_arg { ',' filter_arg }
 filter_arg            ::= 'where' '=' ( predicate_expr | string_literal )
                         | 'limit' '=' ( INTEGER | param )
                         | 'name' '=' ( string_literal | identifier )
+                        | 'backend' '=' ( string_literal | identifier )
 
 (* --------------------------------------------------------------------------- *)
-(* 5. candidate_ids(...)                                                       *)
+(* 5. candidate_ids(...) (alias: ids)                                          *)
 (* --------------------------------------------------------------------------- *)
-candidate_ids_call    ::= 'candidate_ids' '(' candidate_ids_arg_list ')'
+candidate_ids_call    ::= ( 'candidate_ids' | 'ids' ) '(' candidate_ids_arg_list ')'
+                        | ( 'candidate_ids' | 'ids' ) '(' ( array_literal | param ) ')'
 
 candidate_ids_arg_list ::= candidate_ids_arg { ',' candidate_ids_arg }
 candidate_ids_arg     ::= ( 'item_ids' | 'ids' ) '=' ( array_literal | param )
                         | 'limit' '=' ( INTEGER | param )
                         | 'name' '=' ( string_literal | identifier )
+                        | 'backend' '=' ( string_literal | identifier )
 
 (* --------------------------------------------------------------------------- *)
 (* 6. candidate_attributes(...)                                                *)
 (* --------------------------------------------------------------------------- *)
 candidate_attributes_call ::= 'candidate_attributes' '(' candidate_attributes_arg_list ')'
+                            | 'candidate_attributes' '(' ( array_literal | param ) ')'
 
 candidate_attributes_arg_list ::= candidate_attributes_arg { ',' candidate_attributes_arg }
 candidate_attributes_arg      ::= 'item_attributes' '=' ( array_literal | param )
                                 | 'limit' '=' ( INTEGER | param )
                                 | 'name' '=' ( string_literal | identifier )
+                                | 'backend' '=' ( string_literal | identifier )
 ```
 
 ---
 
-## 3. Query Encoders & Search Modes
+## 3. Query Encoder Specs & Search Modes
+
+Query encoders are strategies configured within `similarity(...)` (either via string identifier `encoder='interaction_pooling'`, nested spec `encoder=interaction_pooling(...)`, or by passing input fields directly to `similarity(...)`). They are not standalone SQL functions.
 
 ```ebnf
 (* =========================================================================== *)
-(* Query Encoders (for similarity)                                             *)
+(* Encoder Specifications (for similarity retrieval)                           *)
 (* =========================================================================== *)
 
-encoder_call          ::= precomputed_user_call
-                        | precomputed_item_call
-                        | interaction_pooling_call
-                        | interaction_round_robin_call
-                        | user_attribute_pooling_call
-                        | item_attribute_pooling_call
+encoder_spec          ::= encoder_type_name
+                        | encoder_constructor_spec
 
-precomputed_user_call ::= 'precomputed_user' '(' 'input_user_id' '=' ( string_literal | param ) ')'
-                        | 'precomputed_user' '(' ( string_literal | param ) ')'
+encoder_type_name     ::= 'precomputed_user'
+                        | 'precomputed_item'
+                        | 'interaction_pooling'
+                        | 'interaction_round_robin'
+                        | 'user_attribute_pooling'
+                        | 'item_attribute_pooling'
+                        | 'vector'
+                        | string_literal
 
-precomputed_item_call ::= 'precomputed_item' '(' 'input_item_id' '=' ( string_literal | param ) ')'
-                        | 'precomputed_item' '(' ( string_literal | param ) ')'
+encoder_constructor_spec ::= 'precomputed_user' '(' [ precomputed_user_args ] ')'
+                          | 'precomputed_item' '(' [ precomputed_item_args ] ')'
+                          | 'interaction_pooling' '(' [ interaction_pooling_args ] ')'
+                          | 'interaction_round_robin' '(' [ interaction_rr_args ] ')'
+                          | 'user_attribute_pooling' '(' [ user_attr_pooling_args ] ')'
+                          | 'item_attribute_pooling' '(' [ item_attr_pooling_args ] ')'
+                          | 'vector' '(' [ vector_args ] ')'
 
-interaction_pooling_call ::= 'interaction_pooling' '(' interaction_pooling_arg_list ')'
-interaction_pooling_arg_list ::= interaction_pooling_arg { ',' interaction_pooling_arg }
-interaction_pooling_arg  ::= 'input_user_id' '=' ( string_literal | param )
-                           | 'pooling_function' '=' ( string_literal | 'mean' | 'sum' | 'max' )
+precomputed_user_args ::= 'input_user_id' '=' ( string_literal | param | identifier )
+                        | ( string_literal | param | identifier )
+
+precomputed_item_args ::= 'input_item_id' '=' ( string_literal | param | identifier )
+                        | ( string_literal | param | identifier )
+
+interaction_pooling_args ::= interaction_pooling_arg { ',' interaction_pooling_arg }
+interaction_pooling_arg  ::= 'input_user_id' '=' ( string_literal | param | identifier )
+                           | 'pooling_function' '=' ( string_literal | identifier )
                            | 'truncate_interactions' '=' ( INTEGER | param )
 
-interaction_round_robin_call ::= 'interaction_round_robin' '(' interaction_rr_arg_list ')'
-interaction_rr_arg_list      ::= interaction_rr_arg { ',' interaction_rr_arg }
-interaction_rr_arg           ::= 'input_user_id' '=' ( string_literal | param )
-                               | 'pooling_function' '=' ( string_literal | 'mean' | 'sum' | 'max' )
-                               | 'num_clusters' '=' ( INTEGER | param )
+interaction_rr_args      ::= interaction_rr_arg { ',' interaction_rr_arg }
+interaction_rr_arg       ::= 'input_user_id' '=' ( string_literal | param | identifier )
+                           | 'pooling_function' '=' ( string_literal | identifier )
+                           | 'num_clusters' '=' ( INTEGER | param )
 
-user_attribute_pooling_call  ::= 'user_attribute_pooling' '(' user_attr_pooling_arg_list ')'
-user_attr_pooling_arg_list   ::= user_attr_pooling_arg { ',' user_attr_pooling_arg }
-user_attr_pooling_arg        ::= 'input_user_id' '=' ( string_literal | param )
-                               | 'input_user_features' '=' ( object_literal | param )
+user_attr_pooling_args   ::= user_attr_pooling_arg { ',' user_attr_pooling_arg }
+user_attr_pooling_arg    ::= 'input_user_id' '=' ( string_literal | param | identifier )
+                           | 'input_user_features' '=' ( object_literal | param )
 
-item_attribute_pooling_call  ::= 'item_attribute_pooling' '(' item_attr_pooling_arg_list ')'
-item_attr_pooling_arg_list   ::= item_attr_pooling_arg { ',' item_attr_pooling_arg }
-item_attr_pooling_arg        ::= 'input_item_id' '=' ( string_literal | param )
-                               | 'input_item_features' '=' ( object_literal | param )
+item_attr_pooling_args   ::= item_attr_pooling_arg { ',' item_attr_pooling_arg }
+item_attr_pooling_arg    ::= 'input_item_id' '=' ( string_literal | param | identifier )
+                           | 'input_item_features' '=' ( object_literal | param )
+
+vector_args              ::= ( 'vector' | 'query_vector' ) '=' ( array_literal | param )
 
 (* =========================================================================== *)
-(* Search Modes (for text_search)                                              *)
+(* Search Modes (for text_search retrieval)                                   *)
 (* =========================================================================== *)
 
-search_mode_call      ::= lexical_mode_call
+search_mode_spec      ::= 'lexical'
+                        | 'vector'
+                        | string_literal
+                        | lexical_mode_call
                         | vector_mode_call
 
-lexical_mode_call     ::= 'lexical' '(' [ 'fuzziness_edit_distance' '=' ( INTEGER | param ) ] ')'
-                        | 'lexical'
-
+lexical_mode_call     ::= 'lexical' '(' [ ( 'fuzziness' | 'fuzziness_edit_distance' ) '=' ( INTEGER | param ) ] ')'
 vector_mode_call      ::= 'vector' '(' vector_mode_arg_list ')'
 vector_mode_arg_list  ::= vector_mode_arg { ',' vector_mode_arg }
-vector_mode_arg       ::= 'text_embedding_ref' '=' ( string_literal | param )
+vector_mode_arg       ::= ( 'text_embedding_ref' | 'embedding_ref' ) '=' ( string_literal | param )
                         | 'use_exact_search' '=' ( BOOLEAN | param )
 ```
 
@@ -215,20 +243,22 @@ vector_mode_arg       ::= 'text_embedding_ref' '=' ( string_literal | param )
 
 ```ebnf
 (* =========================================================================== *)
-(* Scoring & Computed Columns                                                 *)
+(* Scoring & Computed Columns (in SELECT or ORDER BY)                          *)
 (* =========================================================================== *)
 
 score_call            ::= 'score' '(' score_arg_list ')'
                         | 'computed_column' '(' score_arg_list ')'
 
 score_arg_list        ::= score_arg { ',' score_arg }
-score_arg             ::= ( 'expression' | 'value_model' ) '=' ( string_literal | identifier )
-                        | 'input_user_id' '=' ( string_literal | param )
+score_arg             ::= ( 'expression' | 'value_model' | 'model' ) '=' ( string_literal | identifier | expr )
+                        | 'input_user_id' '=' ( string_literal | param | identifier )
                         | 'input_user_features' '=' ( object_literal | param )
                         | 'input_interactions_item_ids' '=' ( array_literal | param )
                         | 'preserve_order' '=' ( BOOLEAN | param )
                         | 'name' '=' ( string_literal | identifier )
                         | 'output_alias' '=' ( string_literal | identifier )
+                        | 'backend' '=' ( string_literal | identifier )
+                        | expr  (* Positional expression / model name *)
 ```
 
 ---
@@ -237,7 +267,7 @@ score_arg             ::= ( 'expression' | 'value_model' ) '=' ( string_literal 
 
 ```ebnf
 (* =========================================================================== *)
-(* Reordering Functions                                                       *)
+(* Reordering Functions (in SELECT or REORDER BY)                              *)
 (* =========================================================================== *)
 
 reorder_call          ::= diversity_call
@@ -274,6 +304,9 @@ exploration_arg       ::= 'score' '=' ( identifier | expr )
                         | 'name' '=' ( string_literal | identifier )
                         | 'output_alias' '=' ( string_literal | identifier )
 
+(* --------------------------------------------------------------------------- *)
+(* column_sort(...)                                                            *)
+(* --------------------------------------------------------------------------- *)
 column_sort_call      ::= 'column_sort' '(' column_sort_arg_list ')'
 column_sort_arg_list  ::= column_sort_arg { ',' column_sort_arg }
 column_sort_arg       ::= 'columns' '=' column_spec_list
@@ -282,7 +315,7 @@ column_sort_arg       ::= 'columns' '=' column_spec_list
 
 ---
 
-## 6. Expression & Operator Precedence
+## 6. Expressions & Operator Precedence
 
 ```ebnf
 (* =========================================================================== *)
@@ -316,7 +349,7 @@ unary_expr            ::= ( '+' | '-' ) unary_expr
 
 primary_expr          ::= literal
                         | param
-                        | identifier [ '.' identifier ]
+                        | dotted_identifier
                         | array_literal
                         | object_literal
                         | general_func_call
@@ -324,7 +357,12 @@ primary_expr          ::= literal
                         | cast_expr
                         | '(' expr ')'
 
-general_func_call     ::= identifier '(' [ expr { ',' expr } ] ')'
+dotted_identifier     ::= identifier { '.' identifier }
+
+general_func_call     ::= identifier [ '.' identifier ] '(' [ call_arg_list ] ')'
+call_arg_list         ::= call_arg { ',' call_arg }
+call_arg              ::= [ identifier '=' ] expr
+
 cast_expr             ::= 'CAST' '(' expr 'AS' identifier ')'
 case_expr             ::= 'CASE' [ expr ] { 'WHEN' expr 'THEN' expr } [ 'ELSE' expr ] 'END'
 
